@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaBars, FaSearch, FaTimes } from "react-icons/fa";
 
 const NavBar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -10,7 +10,7 @@ const NavBar = () => {
   };
 
   return (
-    <nav className="bg-blue-600 text-white shadow-md">
+    <nav className="bg-blue-600 text-white shadow-md z-50">
       <div className="container mx-auto flex justify-between items-center p-4">
         <h1 className="text-2xl font-bold">
           <Link to="/">MOVIE DATABASE</Link>
@@ -44,6 +44,15 @@ const NavBar = () => {
               onClick={() => setIsOpen(false)}
             >
               Favorites
+            </Link>
+          </li>
+          <li className="border-t border-blue-700 md:border-none">
+            <Link
+              to="/search"
+              className="block py-2 px-4 text-center md:py-0 md:px-0 hover:text-blue-200 transition duration-300"
+              onClick={() => setIsOpen(false)}
+            >
+              <FaSearch />
             </Link>
           </li>
         </ul>

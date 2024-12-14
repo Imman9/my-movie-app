@@ -4,9 +4,10 @@ import MovieCard from "../../components/MovieCard";
 const Home = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1); // Track current page
-  const [hasMore, setHasMore] = useState(true); // Track if more pages are available
-  const observer = useRef(null); // Ref for the observer
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const observer = useRef(null);
+  const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
   useEffect(() => {
     fetchMovies(page);
@@ -16,11 +17,11 @@ const Home = () => {
     setLoading(true);
     try {
       const res = await fetch(
-        `https://api.themoviedb.org/3/movie/popular?api_key=4aa3f0715b890625ef73adeeace4b907&page=${page}`
+        `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&page=${page}`
       );
       const data = await res.json();
-      setMovies((prevMovies) => [...prevMovies, ...data.results]); // Append new movies
-      setHasMore(data.page < data.total_pages); // Check if more pages exist
+      setMovies((prevMovies) => [...prevMovies, ...data.results]);
+      setHasMore(data.page < data.total_pages);
     } catch (error) {
       console.error("Error fetching movies:", error);
     } finally {
@@ -32,25 +33,25 @@ const Home = () => {
 
   useEffect(() => {
     if (loading) return;
-    if (observer.current) observer.current.disconnect(); // Disconnect existing observer
+    if (observer.current) observer.current.disconnect();
 
     observer.current = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          setPage((prevPage) => prevPage + 1); // Load next page when last item is in view
+          setPage((prevPage) => prevPage + 1);
         }
       },
       { threshold: 1.0 }
     );
 
     if (lastMovieElementRef.current) {
-      observer.current.observe(lastMovieElementRef.current); // Observe the last movie
+      observer.current.observe(lastMovieElementRef.current);
     }
   }, [loading, hasMore]);
 
   return (
     <div className="p-6">
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6  p-6 mt-16 md:mt-0">
         {movies.map((movieItem, index) => {
           if (index === movies.length - 1) {
             return (
