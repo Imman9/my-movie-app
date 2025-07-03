@@ -14,8 +14,9 @@ const Details = () => {
   const apiKey = import.meta.env.VITE_TMDB_API_KEY;
 
   const [movieDetails, setMovieDetails] = useState(null);
-  const [trailerUrl, setTrailerUrl] = useState(null);
+  const [trailerKey, setTrailerKey] = useState(null); // Changed from trailerUrl to trailerKey
   const [loading, setLoading] = useState(true);
+  const [showTrailer, setShowTrailer] = useState(false); // New state to control trailer visibility
 
   const isFavorite = favorites.some((fav) => fav.id === parseInt(id));
 
@@ -41,16 +42,18 @@ const Details = () => {
   const fetchTrailer = async () => {
     try {
       const res = await fetch(
-        `https://api.themoviedb.org/3/movie/${id}/videos?api_key=4aa3f0715b890625ef73adeeace4b907`
+        `https://api.themoviedb.org/3/movie/${id}/videos?api_key=${apiKey}`
       );
       const data = await res.json();
       const trailer = data.results.find((video) => video.type === "Trailer");
-      setTrailerUrl(
-        trailer ? `https://www.youtube.com/watch?v=${trailer.key}` : null
-      );
+      setTrailerKey(trailer?.key || null); // Store just the YouTube key
     } catch (error) {
       console.error("Error fetching trailer:", error);
     }
+  };
+
+  const toggleTrailer = () => {
+    setShowTrailer(!showTrailer);
   };
 
   const handleAddToFavorites = () => {
@@ -97,15 +100,30 @@ const Details = () => {
             <strong>Rating:</strong> {movieDetails.vote_average}/10
           </p>
 
-          {trailerUrl ? (
-            <a
-              href={trailerUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition"
-            >
-              Watch Trailer
-            </a>
+          {trailerKey ? (
+            <div>
+              <button
+                onClick={toggleTrailer}
+                className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition"
+              >
+                {showTrailer ? 'Hide Trailer' : 'Show Trailer'}
+              </button>
+              
+              {showTrailer && (
+                <div className="mt-4 aspect-video w-full max-w-2xl">
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
+                    title="YouTube video player"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="rounded-lg shadow-md"
+                  ></iframe>
+                </div>
+              )}
+            </div>
           ) : (
             <p className="text-gray-500">No trailer available</p>
           )}
